@@ -24,7 +24,7 @@ packages:
     file: status_led_package.yaml
 ```
 
-Make sure your project defines the required GTB LED light with the **ID `system_status_led`**. The following `light` configuration has proven to work on a [LOLIN C3 Mini](https://www.espboards.dev/esp32/lolin-c3-mini/) (`board: lolin_c3_mini`):
+Make sure your project defines the required RGB LED light with the **ID `system_status_led`**. The following `light` configuration has proven to work on a [LOLIN C3 Mini](https://www.espboards.dev/esp32/lolin-c3-mini/) (`board: lolin_c3_mini`):
 
 ```yaml
 light:
