@@ -1,0 +1,126 @@
+##### GLOBAL DEFINITIONS #####
+globals:
+  - id: boot_done
+    type: bool
+    initial_value: "false"
+  - id: wifi_ok
+    type: bool
+    initial_value: "false"
+  - id: api_ok
+    type: bool
+    initial_value: "false"
+
+
+
+##### CATCH SYSTEM EVENTS #####
+esphome:
+  on_boot:
+    priority: -10
+    then:
+      - lambda: 'id(boot_done) = true;'
+      - script.execute: led_system_status
+
+wifi:
+  on_connect:
+    then:
+      - lambda: 'id(wifi_ok) = true;'
+      - script.execute: led_system_status
+  on_disconnect:
+    then:
+      - lambda: 'id(wifi_ok) = false;'
+      - script.execute: led_system_status
+
+api:
+  on_client_connected:
+    then:
+      - lambda: 'id(api_ok) = true;'
+      - script.execute: led_system_status
+  on_client_disconnected:
+    then:
+      - lambda: 'id(api_ok) = false;'
+      - script.execute: led_system_status
+
+
+
+##### ASSIGN COLORS TO LED #####
+script:
+  - id: led_system_status
+    mode: restart
+    then:
+      # API CONNECTED (Priority 4) - green (steady)
+      - if:
+          condition:
+            lambda: 'return id(api_ok);'
+          then:
+            - light.turn_on:
+                id: system_status_led
+                red: 0%
+                green: 100%
+                blue: 10%
+                brightness: 50%
+                effect: none
+            - script.stop:
+                id: led_system_status
+
+      # WIFI OK (Priority 3) - white (steady)
+      - if:
+          condition:
+            lambda: 'return id(wifi_ok);'
+          then:
+            - light.turn_on:
+                id: system_status_led
+                red: 100%
+                green: 100%
+                blue: 100%
+                brightness: 50%
+                effect: none
+            - script.stop:
+                id: led_system_status
+
+      # BOOT DONE (Priority 2) - yellow (fast pulse)
+      - if:
+          condition:
+            lambda: 'return id(boot_done);'
+          then:
+            - light.turn_on:
+                id: system_status_led
+                red: 100%
+                green: 80%
+                blue: 0
+                brightness: 50%
+                effect: "Fast Pulse"
+            - script.stop:
+                id: led_system_status
+
+      # BOOTING (Priority 1) - red (fast pulse)
+      - light.turn_on:
+          id: system_status_led
+          red: 100%
+          green: 0
+          blue: 0
+          brightness: 100%
+          effect: "Fast Pulse"
+
+
+  - id: led_working_status_1
+    # WORKING MODE 1 - blue (slow pulse)
+    then:
+      - light.turn_on:
+          id: system_status_led
+          red: 0%
+          green: 0%
+          blue: 100%
+          brightness: 50%
+          effect: "Slow Pulse"
+
+  - id: led_working_status_2
+    # WORKING MODE 2 - purple (slow pulse)
+    then:
+      - light.turn_on:
+          id: system_status_led
+          red: 80%
+          green: 0%
+          blue: 80%
+          brightness: 50%
+          effect: "Slow Pulse"
+
