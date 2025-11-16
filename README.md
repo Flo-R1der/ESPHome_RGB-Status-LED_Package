@@ -2,7 +2,7 @@
 
 A reusable ESPHome package that provides a prioritized RGB status LED system. It visualizes 
 key device states such as booting, WiFi connectivity, API availability. 
-The package only requires a single RGB light entity with the ID `system_status_led`.
+The package only requires a single RGB light entity with the ID **`system_status_led`**.
 
 ## 🚀 Features
 
@@ -60,12 +60,12 @@ light:
 The **LED system status** follows a strict top-down priority. The highest matching state always wins.
 If a condition is no longer fulfilled, the LED falls back to the previous applicable state.
 
-| Priority | Color / Effect           | System State                       | Notes                                    |
-| -------- | ------------------------ | ---------------------------------- | ---------------------------------------- |
-|   1      | **Red – fast pulsing**   | Booting / initialization           | Shown before WiFi stack is ready         |
-|   2      | **Yellow – static**      | Boot completed, WiFi not connected | Waiting for WiFi / network issue?        |
-|   3      | **White – static**       | WiFi connected, HA not connected   | network OK, Home Assistant not connected |
-|   4      | **Green – static**       | Home Assistant connected           | FULLY STARTED - Normal operating mode    |
+| Priority | Color + Effect            | System State             | Notes                                    |
+| -------- | ------------------------- | ------------------------ | ---------------------------------------- |
+|   1      | **Red**<br>fast pulsing   | Booting / initialization | Shown before WiFi stack is ready         |
+|   2      | **Yellow**<br>static      | Boot completed           | Waiting for WiFi / network issue?        |
+|   3      | **White**<br>static       | WiFi connected           | network OK, Home Assistant not connected |
+|   4      | **Green**<br>static       | Home Assistant connected | FULLY STARTED - Normal operating mode    |
 
 
 ### Custom States
@@ -74,11 +74,11 @@ Additionally there are **LED working states** provided, which can be triggered f
 They are meant to signals states separate from the main priority logic.
 They temporarily override the LED as long as the script is active, similar to the beacon state.
 
-| Script ID              | Color / Effect            | Notes (Examples)                                                       |
-| ---------------------- | ------------------------- | ---------------------------------------------------------------------- |
-| `led_working_status_1` | **Blue – slow pulsing**   | Example: device performing a background task; BT-beacon detected; etc. |
-| `led_working_status_2` | **Purple – slow pulsing** | Example: special output is turned on; long-running I²C read; etc.      |
-|                        |                           | _add more if you like_ |
+| Script ID              | Color + Effect             | Notes (Examples)                                                       |
+| ---------------------- | -------------------------- | ---------------------------------------------------------------------- |
+| `led_working_status_1` | **Blue**<br>slow pulsing   | Example: device performing a background task; BT-beacon detected; etc. |
+| `led_working_status_2` | **Purple**<br>slow pulsing | Example: special output is turned on; long-running I²C read; etc.      |
+| `led_working_status_*` | _add more if you like_     |                                                                        |
 
 To set and reset the working light you can call the following scripts:
 - `- script.execute: led_working_status_1` (_or any other number_)
@@ -119,6 +119,8 @@ binary_sensor:
 - If API repeatedly connects/disconnects, check your WiFi RSSI.
 - Validate that the ESPHome API is properly configured in Home Assistant.
 - If using VLANS or firewalls, ensure port `6053` is allowed.
+
+<br>
 
 ---
 
