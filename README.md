@@ -52,3 +52,51 @@ light:
 > The package does **not** depend on any specific LED chipset or ESP32 variant.  
 > If you prefer another LED type (NeopixelBus, FastLED, CWWW RGB LED), simply keep the ID identical.  
 
+
+## 💡 LED Colors and States
+
+### System States
+
+The **LED system status** follows a strict top-down priority. The highest matching state always wins.
+If a condition is no longer fulfilled, the LED falls back to the previous applicable state.
+
+| Priority | Color / Effect           | System State                       | Notes                                    |
+| -------- | ------------------------ | ---------------------------------- | ---------------------------------------- |
+|   1      | **Red – fast pulsing**   | Booting / initialization           | Shown before WiFi stack is ready         |
+|   2      | **Yellow – static**      | Boot completed, WiFi not connected | Waiting for WiFi / network issue?        |
+|   3      | **White – static**       | WiFi connected, HA not connected   | network OK, Home Assistant not connected |
+|   4      | **Green – static**       | Home Assistant connected           | FULLY STARTED - Normal operating mode    |
+
+
+### Custom States
+
+Additionally there are **LED working states** provided, which can be triggered from your main device configuration.
+They are meant to signals states separate from the main priority logic.
+They temporarily override the LED as long as the script is active, similar to the beacon state.
+
+| Script ID              | Color / Effect            | Notes (Examples)                                                       |
+| ---------------------- | ------------------------- | ---------------------------------------------------------------------- |
+| `led_working_status_1` | **Blue – slow pulsing**   | Example: device performing a background task; BT-beacon detected; etc. |
+| `led_working_status_2` | **Purple – slow pulsing** | Example: special output is turned on; long-running I²C read; etc.      |
+|                        |                           | _add more if you like_ |
+
+To set and reset the working light you can call the following scripts:
+- `- script.execute: led_working_status_1` (_or any other number_)
+- `- script.execute: led_system_status` (_to reset the LED to the system-status_)
+
+Example:
+```yaml
+binary_sensor:
+  - platform: ble_presence
+    mac_address: ${ble_beacon_mac}
+    name: "BLE-Beacon Present"
+    id: ble_beacon_presence
+    timeout: 60s
+    on_press:
+      then:
+        - script.execute: led_working_status_1
+    on_release:
+      then:
+        - script.execute: led_system_status
+```
+
