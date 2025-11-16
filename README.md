@@ -100,3 +100,33 @@ binary_sensor:
         - script.execute: led_system_status
 ```
 
+
+## 🚩 Troubleshooting
+
+### LED Does Not Light Up
+
+- Confirm that the LED hardware definition exists in your main config and uses the same `id:` expected by the package.
+- Double-check pin numbers, chipset type, and RGB order.
+- Ensure your power supply can drive the LED (WS2812 requires stable 5V).
+
+### LED Only Shows One Color or Wrong Colors
+
+- Incorrect `rgb_order`.
+  Try switching between `RGB`, `GRB`, or `BRG` depending on the LED hardware.
+
+### Home Assistant API Status Seems Wrong
+
+- If API repeatedly connects/disconnects, check your WiFi RSSI.
+- Validate that the ESPHome API is properly configured in Home Assistant.
+- If using VLANS or firewalls, ensure port `6053` is allowed.
+
+---
+
+## 📌 Open Topics
+
+- [ ] Add a substitution value for general brightness (now all states are on 50%)
+- [ ] Create additional working-status templates with more effects.
+- [ ] A selectable "stealth mode" (LED off unless error) would be nice.
+
+## ❤️ Like My Work?
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I4160K4Y)

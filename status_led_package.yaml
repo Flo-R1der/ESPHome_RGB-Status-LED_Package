@@ -98,7 +98,7 @@ script:
           red: 100%
           green: 0
           blue: 0
-          brightness: 100%
+          brightness: 50%
           effect: "Fast Pulse"
 
 
