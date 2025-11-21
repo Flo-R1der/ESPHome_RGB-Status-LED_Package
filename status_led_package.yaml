@@ -15,7 +15,7 @@ globals:
 ##### CATCH SYSTEM EVENTS #####
 esphome:
   on_boot:
-    - priority: 800
+    - priority: 700
       then:
         - script.execute: led_system_status
     - priority: -10
