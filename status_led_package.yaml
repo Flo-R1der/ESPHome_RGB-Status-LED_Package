@@ -15,12 +15,12 @@ globals:
 ##### CATCH SYSTEM EVENTS #####
 esphome:
   on_boot:
+    - priority: 800
+      then:
+        - script.execute: led_system_status
     - priority: -10
       then:
-        - lambda: |
-            ESP_LOGD("status_led_package", "------ on boot -10 ------");
-            id(boot_done) = true;
-            ESP_LOGD("status_led_package", "boot_done = %s", id(boot_done) ? "true" : "false");
+        - lambda: 'id(boot_done) = true;'
         - script.execute: led_system_status
 
 wifi:
