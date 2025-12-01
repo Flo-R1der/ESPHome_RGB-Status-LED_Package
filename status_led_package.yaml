@@ -13,6 +13,7 @@ globals:
 
 
 ##### CATCH SYSTEM EVENTS #####
+# boot priority values: https://esphome.io/components/esphome/#configuration-variables-1
 esphome:
   on_boot:
     - priority: 700
@@ -20,6 +21,9 @@ esphome:
         - script.execute: led_system_status
     - priority: -10
       then:
+        - delay: 500ms
+          # depending on your board, the red LED may light up so shortly that you don't see it
+          # this delay ensures the red light comes up and you can recognize boot-loop issues
         - lambda: 'id(boot_done) = true;'
         - script.execute: led_system_status
 
