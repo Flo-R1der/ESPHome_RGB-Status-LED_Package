@@ -41,16 +41,27 @@ light:
     restore_mode: ALWAYS_OFF
     effects:
       - pulse:
-          name: "Slow Pulse"          # REQUIRED
-          update_interval: 2s         # can be adjusted
+          name: "Slow Pulse"                               # REQUIRED
+          update_interval: 1s                              # can be adjusted
+          max_brightness: ${system_status_led_brightness}  # provided by the package
       - pulse:
-          name: "Fast Pulse"          # REQUIRED
-          update_interval: 500ms      # can be adjusted
+          name: "Fast Pulse"                               # REQUIRED
+          update_interval: 400ms                           # can be adjusted
+          max_brightness: ${system_status_led_brightness}  # provided by the package
 ```
 
 > [!NOTE]  
 > The package does **not** depend on any specific LED chipset or ESP32 variant.  
 > If you prefer another LED type (NeopixelBus, FastLED, CWWW RGB LED), simply keep the ID identical.  
+
+
+### Optional: brightness value
+The predefined brightness is set to `50%`. This can be overridden, by adding a suitable value to your project:
+
+````yaml
+substitutions:
+  system_status_led_brightness: "20%"
+````
 
 
 ## 💡 LED Colors and States
@@ -62,8 +73,8 @@ If a condition is no longer fulfilled, the LED falls back to the previous applic
 
 | Priority | Color + Effect            | System State             | Notes                                    |
 | -------- | ------------------------- | ------------------------ | ---------------------------------------- |
-|   1      | **Red**<br>fast pulsing   | Booting / initialization | Shown before WiFi stack is ready         |
-|   2      | **Yellow**<br>static      | Boot completed           | Waiting for WiFi / network issue?        |
+|   1      | **Red**<br>fast pulse     | Booting / initialization | Shown before WiFi stack is ready         |
+|   2      | **Yellow**<br>fast pulse  | Boot completed           | Waiting for WiFi / network issue?        |
 |   3      | **White**<br>static       | WiFi connected           | network OK, Home Assistant not connected |
 |   4      | **Green**<br>static       | Home Assistant connected | FULLY STARTED - Normal operating mode    |
 
@@ -76,8 +87,8 @@ They temporarily override the LED as long as the script is active, similar to th
 
 | Script ID              | Color + Effect             | Notes (Examples)                                                       |
 | ---------------------- | -------------------------- | ---------------------------------------------------------------------- |
-| `led_working_status_1` | **Blue**<br>slow pulsing   | Example: device performing a background task; BT-beacon detected; etc. |
-| `led_working_status_2` | **Purple**<br>slow pulsing | Example: special output is turned on; long-running I²C read; etc.      |
+| `led_working_status_1` | **Blue**<br>slow pulse     | Example: device performing a background task; BT-beacon detected; etc. |
+| `led_working_status_2` | **Purple**<br>slow pulse   | Example: special output is turned on; long-running I²C read; etc.      |
 | `led_working_status_*` | _add more if you like_     |                                                                        |
 
 To set and reset the working light you can call the following scripts:
@@ -126,7 +137,6 @@ binary_sensor:
 
 ## 📌 Open Topics
 
-- [ ] Add a substitution value for general brightness (now all states are on 50%)
 - [ ] Create additional working-status templates with more effects.
 - [ ] A selectable "stealth mode" (LED off unless error) would be nice.
 

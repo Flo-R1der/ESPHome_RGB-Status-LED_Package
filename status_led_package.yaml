@@ -1,4 +1,4 @@
-##### GLOBAL DEFINITIONS #####
+##### GLOBAL DEFINITIONS AND SUBSTITUTIONS #####
 globals:
   - id: boot_done
     type: bool
@@ -10,15 +10,25 @@ globals:
     type: bool
     initial_value: "false"
 
+substitutions:
+  system_status_led_brightness: "50%"   # Default
+
 
 
 ##### CATCH SYSTEM EVENTS #####
+# boot priority values: https://esphome.io/components/esphome/#configuration-variables-1
 esphome:
   on_boot:
-    priority: -10
-    then:
-      - lambda: 'id(boot_done) = true;'
-      - script.execute: led_system_status
+    - priority: 700
+      then:
+        - script.execute: led_system_status
+    - priority: -10
+      then:
+        - delay: 500ms
+          # depending on your board, the red LED may light up so shortly that you don't see it
+          # this delay ensures the red light comes up and you can recognize boot-loop issues
+        - lambda: 'id(boot_done) = true;'
+        - script.execute: led_system_status
 
 wifi:
   on_connect:
@@ -57,7 +67,7 @@ script:
                 red: 0%
                 green: 100%
                 blue: 10%
-                brightness: 50%
+                brightness: ${system_status_led_brightness}
                 effect: none
             - script.stop:
                 id: led_system_status
@@ -72,7 +82,7 @@ script:
                 red: 100%
                 green: 100%
                 blue: 100%
-                brightness: 50%
+                brightness: ${system_status_led_brightness}
                 effect: none
             - script.stop:
                 id: led_system_status
@@ -85,7 +95,7 @@ script:
             - light.turn_on:
                 id: system_status_led
                 red: 100%
-                green: 80%
+                green: 100%
                 blue: 0
                 brightness: 50%
                 effect: "Fast Pulse"
@@ -110,7 +120,7 @@ script:
           red: 0%
           green: 0%
           blue: 100%
-          brightness: 50%
+          brightness: ${system_status_led_brightness}
           effect: "Slow Pulse"
 
   - id: led_working_status_2
@@ -121,6 +131,6 @@ script:
           red: 80%
           green: 0%
           blue: 80%
-          brightness: 50%
+          brightness: ${system_status_led_brightness}
           effect: "Slow Pulse"
 
