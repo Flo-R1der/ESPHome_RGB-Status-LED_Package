@@ -89,15 +89,7 @@ If a condition is no longer fulfilled, the LED falls back to the previous applic
 Additionally there are LED states provided, which can be triggered from your main device configuration.
 They are meant to signals states separate from the main priority logic and override the system status display until anything else updates the LED state. Currently the following states are supported:
 
- `led_working_status_<color>`:
-<b style="color:dodgerblue">blue</b> |
-<b style="color:darkmagenta">purple</b> |
-<b style="color:red">red</b> |
-<b style="color:darkorange">orange</b> |
-<b style="color:sand">yellow</b> |
-<b style="color:lime">green</b> |
-<b style="color:aqua">cyan</b> |
-<b style="color:lightgray">white</b>
+ `led_working_status_<color>` **blue🔵 | purple🟣 | red🔴 | orange🟠 | yellow🟡 | green🟢 | cyan🔷 | white⚪**
 
 ```yaml
 binary_sensor:
@@ -122,15 +114,8 @@ binary_sensor:
 
 In case you want some direct feedback to any (user) action, the LED can blink several times in these supported colors:
 
- `led_feedback_blink_<color>`:
-<b style="color:dodgerblue">blue</b> |
-<b style="color:darkmagenta">purple</b> |
-<b style="color:red">red</b> |
-<b style="color:darkorange">orange</b> |
-<b style="color:gold">yellow</b> |
-<b style="color:lime">green</b> |
-<b style="color:aqua">cyan</b> |
-<b style="color:lightgray">white</b>
+`led_feedback_blink_<color>` **blue🔵 | purple🟣 | red🔴 | orange🟠 | yellow🟡 | green🟢 | cyan🔷 | white⚪**
+
 
 ```yaml
 # more code // FIXME
