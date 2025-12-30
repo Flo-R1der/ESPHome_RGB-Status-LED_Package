@@ -10,7 +10,7 @@ The package only requires a single RGB light entity with the ID **`system_status
    - booting → boot done → WiFi connected → Home Assistant connected
 - Drop-in ESPHome package - detects system states on it's own.
 - Works with any RGB LED platform (Neopixel, RMT LED Strip, Cwww, etc.).
-- Optional `working` states provided (status evaluation, actuator working, beacon activity, ...).
+- Optional **working** and **feedback** states provided (status evaluation, actuator working, beacon activity, ...).
 
 
 ## 🛠️ Set Up
@@ -39,14 +39,18 @@ light:
     default_transition_length: 200ms
     icon: mdi:led-outline
     restore_mode: ALWAYS_OFF
-    effects:
+    effects:                          # only for working- or feedback-states required
       - pulse:
-          name: "Slow Pulse"                               # REQUIRED
+          name: "Fast Pulse"                               # can be adjusted
+          update_interval: 400ms                           # can be adjusted
+          max_brightness: ${system_status_led_brightness}  # provided by the package
+      - pulse:
+          name: "Slow Pulse"                               # can be adjusted
           update_interval: 1s                              # can be adjusted
           max_brightness: ${system_status_led_brightness}  # provided by the package
       - pulse:
-          name: "Fast Pulse"                               # REQUIRED
-          update_interval: 400ms                           # can be adjusted
+          name: "Breath"                                   # can be adjusted
+          update_interval: 2.5s                            # can be adjusted
           max_brightness: ${system_status_led_brightness}  # provided by the package
 ```
 
@@ -114,6 +118,35 @@ binary_sensor:
 > `led_working_status_1` and `led_working_status_2` from a previous version are still supported.
 
 
+### Optional: 📣 Feedback States - blinking
+
+In case you want some direct feedback to any (user) action, the LED can blink several times in these supported colors:
+
+ `led_feedback_blink_<color>`:
+<b style="color:dodgerblue">blue</b> |
+<b style="color:darkmagenta">purple</b> |
+<b style="color:red">red</b> |
+<b style="color:darkorange">orange</b> |
+<b style="color:gold">yellow</b> |
+<b style="color:lime">green</b> |
+<b style="color:aqua">cyan</b> |
+<b style="color:lightgray">white</b>
+
+```yaml
+# more code // FIXME
+- script.execute:
+    id: led_feedback_blink_red
+    count: 3   # required
+```
+
+The predefined time for LED-On and LED-Pause is set to `200ms`. Can be overridden:
+
+````yaml
+substitutions:
+  blink_on_off_time: "300ms"
+````
+
+
 ## 🚩 Troubleshooting
 
 ### LED Does Not Light Up
@@ -139,7 +172,6 @@ binary_sensor:
 
 ## 📌 Open Topics
 
-- [ ] Create additional working-status templates with more effects.
 - [ ] A selectable "stealth mode" (LED off unless error) would be nice.
 
 ## ❤️ Like My Work?
