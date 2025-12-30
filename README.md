@@ -80,23 +80,21 @@ If a condition is no longer fulfilled, the LED falls back to the previous applic
 
 
 
-### Custom States
+### Optional: ⚙️ Working States - pulsing light
 
-Additionally there are **LED working states** provided, which can be triggered from your main device configuration.
-They are meant to signals states separate from the main priority logic.
-They temporarily override the LED as long as the script is active, similar to the beacon state.
+Additionally there are LED states provided, which can be triggered from your main device configuration.
+They are meant to signals states separate from the main priority logic and override the system status display until anything else updates the LED state. Currently the following states are supported:
 
-| Script ID              | Color + Effect             | Notes (Examples)                                                       |
-| ---------------------- | -------------------------- | ---------------------------------------------------------------------- |
-| `led_working_status_1` | **Blue**<br>slow pulse     | Example: device performing a background task; BT-beacon detected; etc. |
-| `led_working_status_2` | **Purple**<br>slow pulse   | Example: special output is turned on; long-running I²C read; etc.      |
-| `led_working_status_*` | _add more if you like_     |                                                                        |
+ `led_working_status_<color>`:
+<b style="color:dodgerblue">blue</b> |
+<b style="color:darkmagenta">purple</b> |
+<b style="color:red">red</b> |
+<b style="color:darkorange">orange</b> |
+<b style="color:sand">yellow</b> |
+<b style="color:lime">green</b> |
+<b style="color:aqua">cyan</b> |
+<b style="color:lightgray">white</b>
 
-To set and reset the working light you can call the following scripts:
-- `- script.execute: led_working_status_1` (_or any other number_)
-- `- script.execute: led_system_status` (_to reset the LED to the system-status_)
-
-Example:
 ```yaml
 binary_sensor:
   - platform: ble_presence
@@ -106,11 +104,14 @@ binary_sensor:
     timeout: 60s
     on_press:
       then:
-        - script.execute: led_working_status_1
+        - script.execute: led_working_status_blue
+          effect: "Slow Pulse"   # required
     on_release:
       then:
-        - script.execute: led_system_status
+        - script.execute: led_system_status   # reset to the system status
 ```
+
+> `led_working_status_1` and `led_working_status_2` from a previous version are still supported.
 
 
 ## 🚩 Troubleshooting
