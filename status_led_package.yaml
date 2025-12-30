@@ -98,7 +98,7 @@ script:
                 green: 100%
                 blue: 0
                 brightness: 50%
-                effect: "Fast Pulse"
+                effect: none
             - script.stop:
                 id: led_system_status
 
@@ -109,7 +109,7 @@ script:
           green: 0
           blue: 0
           brightness: 50%
-          effect: "Fast Pulse"
+          effect: none
 
 
   - id: led_working_status_1

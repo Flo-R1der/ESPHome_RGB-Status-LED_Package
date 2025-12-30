@@ -66,17 +66,18 @@ substitutions:
 
 ## 💡 LED Colors and States
 
-### System States
+### 🚦 System States - static light
 
 The **LED system status** follows a strict top-down priority. The highest matching state always wins.
 If a condition is no longer fulfilled, the LED falls back to the previous applicable state.
 
 | Priority | Color + Effect            | System State             | Notes                                    |
 | -------- | ------------------------- | ------------------------ | ---------------------------------------- |
-|   1      | **Red**<br>fast pulse     | Booting / initialization | Shown before WiFi stack is ready         |
-|   2      | **Yellow**<br>fast pulse  | Boot completed           | Waiting for WiFi / network issue?        |
-|   3      | **White**<br>static       | WiFi connected           | network OK, Home Assistant not connected |
-|   4      | **Green**<br>static       | Home Assistant connected | FULLY STARTED - Normal operating mode    |
+|   1      | 🔴 **Red**<br>static     | Booting / initialization | Shown before WiFi stack is ready         |
+|   2      | 🟡 **Yellow**<br>static  | Boot completed           | Waiting for WiFi / network issue?        |
+|   3      | ⚪ **White**<br>static   | WiFi connected           | network OK, Home Assistant not connected |
+|   4      | 🟢 **Green**<br>static   | Home Assistant connected | FULLY STARTED - Normal operating mode    |
+
 
 
 ### Custom States
