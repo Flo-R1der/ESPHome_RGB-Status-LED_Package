@@ -30,15 +30,16 @@ Make sure your project defines the required RGB LED light with the **ID `system_
 light:
   - platform: esp32_rmt_led_strip
     id: system_status_led             # DO NOT CHANGE
+    name: "Status-LED"
     pin: GPIO7                        # check your board
     rgb_order: GRB                    # check your board
     num_leds: 1
     chipset: ws2812                   # check your board
-    name: "onboard LED"
     disabled_by_default: true
     default_transition_length: 200ms
     icon: mdi:led-outline
     restore_mode: ALWAYS_OFF
+    entity_category: "diagnostic"
     effects:                          # only for working- or feedback-states required
       - pulse:
           name: "Fast Pulse"                               # can be adjusted
