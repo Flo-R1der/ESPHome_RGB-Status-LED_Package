@@ -79,9 +79,9 @@ script:
           then:
             - light.turn_on:
                 id: system_status_led
-                red: 100%
-                green: 100%
-                blue: 100%
+                red: 70%
+                green: 70%
+                blue: 70%
                 brightness: ${system_status_led_brightness}
                 effect: none
             - script.stop:
@@ -94,8 +94,8 @@ script:
           then:
             - light.turn_on:
                 id: system_status_led
-                red: 100%
-                green: 100%
+                red: 80%
+                green: 80%
                 blue: 0
                 brightness: 50%
                 effect: none
