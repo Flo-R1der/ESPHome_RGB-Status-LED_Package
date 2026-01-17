@@ -120,10 +120,31 @@ In case you want some direct feedback to any (user) action, the LED can blink se
 
 
 ```yaml
-# more code // FIXME
-- script.execute:
-    id: led_feedback_blink_red
-    count: 3   # required
+fingerprint_grow:
+  id: fingerprint_reader
+  name: "Fingerprint-Reader"
+  sensing_pin: GPIO15
+  sensor_power_pin:
+      number: GPIO14
+      inverted: true
+  idle_period_to_sleep: 5s
+
+  on_finger_scan_start:
+    then:
+      - script.execute: 
+          id: led_working_status_cyan
+          effect: "Fast Pulse"
+  on_finger_scan_matched:
+    then:
+      - script.execute: 
+          id: led_feedback_blink_green
+          count: 2                        # required, can be 1
+      - button.press: unlock_button
+  on_finger_scan_unmatched:
+    then:
+      - script.execute: 
+          id: led_feedback_blink_red
+          count: 3                        # required, can be 1
 ```
 
 The predefined time for LED-On and LED-Pause is set to `200ms`. Can be overridden:
