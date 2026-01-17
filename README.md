@@ -100,8 +100,9 @@ binary_sensor:
     timeout: 60s
     on_press:
       then:
-        - script.execute: led_working_status_blue
-          effect: "Slow Pulse"   # required
+        - script.execute: 
+          id: led_working_status_blue
+          effect: "Slow Pulse"                # required, can be 'none'
     on_release:
       then:
         - script.execute: led_system_status   # reset to the system status

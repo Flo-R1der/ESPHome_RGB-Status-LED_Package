@@ -87,7 +87,7 @@ script:
             - script.stop:
                 id: led_system_status
 
-      # BOOT DONE (Priority 2) - yellow (fast pulse)
+      # BOOT DONE (Priority 2) - yellow (steady)
       - if:
           condition:
             lambda: 'return id(boot_done);'
@@ -102,7 +102,7 @@ script:
             - script.stop:
                 id: led_system_status
 
-      # BOOTING (Priority 1) - red (fast pulse)
+      # BOOTING (Priority 1) - red (steady)
       - light.turn_on:
           id: system_status_led
           red: 100%
@@ -128,8 +128,9 @@ script:
           effect: !lambda 'return effect;'
   - id: led_working_status_1  # LEGACY ALIAS → led_working_status_blue
     then:
-      - script.execute: led_working_status_blue
-        effect: "Slow Pulse"
+      - script.execute: 
+          id: led_working_status_blue
+          effect: "Slow Pulse"
 
   - id: led_working_status_purple
     parameters:
@@ -144,8 +145,9 @@ script:
           effect: !lambda 'return effect;'
   - id: led_working_status_2  # LEGACY ALIAS → led_working_status_purple
     then:
-      - script.execute: led_working_status_purple
-        effect: "Slow Pulse"
+      - script.execute:
+          id: led_working_status_purple
+          effect: "Slow Pulse"
 
   - id: led_working_status_red
     parameters:
