@@ -10,7 +10,7 @@ The package only requires a single RGB light entity with the ID **`system_status
    - booting → boot done → WiFi connected → Home Assistant connected
 - Drop-in ESPHome package - detects system states on it's own.
 - Works with any RGB LED platform (Neopixel, RMT LED Strip, Cwww, etc.).
-- Optional `working` states provided (status evaluation, actuator working, beacon activity, ...).
+- Optional **working** and **feedback** states provided (status evaluation, actuator working, beacon activity, ...).
 
 
 ## 🛠️ Set Up
@@ -30,23 +30,28 @@ Make sure your project defines the required RGB LED light with the **ID `system_
 light:
   - platform: esp32_rmt_led_strip
     id: system_status_led             # DO NOT CHANGE
+    name: "Status-LED"
     pin: GPIO7                        # check your board
     rgb_order: GRB                    # check your board
     num_leds: 1
     chipset: ws2812                   # check your board
-    name: "onboard LED"
     disabled_by_default: true
     default_transition_length: 200ms
     icon: mdi:led-outline
     restore_mode: ALWAYS_OFF
-    effects:
+    entity_category: "diagnostic"
+    effects:                          # only for working- or feedback-states required
       - pulse:
-          name: "Slow Pulse"                               # REQUIRED
+          name: "Fast Pulse"                               # can be adjusted
+          update_interval: 400ms                           # can be adjusted
+          max_brightness: ${system_status_led_brightness}  # provided by the package
+      - pulse:
+          name: "Slow Pulse"                               # can be adjusted
           update_interval: 1s                              # can be adjusted
           max_brightness: ${system_status_led_brightness}  # provided by the package
       - pulse:
-          name: "Fast Pulse"                               # REQUIRED
-          update_interval: 400ms                           # can be adjusted
+          name: "Breath"                                   # can be adjusted
+          update_interval: 2.5s                            # can be adjusted
           max_brightness: ${system_status_led_brightness}  # provided by the package
 ```
 
@@ -66,36 +71,27 @@ substitutions:
 
 ## 💡 LED Colors and States
 
-### System States
+### 🚦 System States - static light
 
 The **LED system status** follows a strict top-down priority. The highest matching state always wins.
 If a condition is no longer fulfilled, the LED falls back to the previous applicable state.
 
 | Priority | Color + Effect            | System State             | Notes                                    |
 | -------- | ------------------------- | ------------------------ | ---------------------------------------- |
-|   1      | **Red**<br>fast pulse     | Booting / initialization | Shown before WiFi stack is ready         |
-|   2      | **Yellow**<br>fast pulse  | Boot completed           | Waiting for WiFi / network issue?        |
-|   3      | **White**<br>static       | WiFi connected           | network OK, Home Assistant not connected |
-|   4      | **Green**<br>static       | Home Assistant connected | FULLY STARTED - Normal operating mode    |
+|   1      | 🔴 **Red**<br>static     | Booting / initialization | Shown before WiFi stack is ready         |
+|   2      | 🟡 **Yellow**<br>static  | Boot completed           | Waiting for WiFi / network issue?        |
+|   3      | ⚪ **White**<br>static   | WiFi connected           | network OK, Home Assistant not connected |
+|   4      | 🟢 **Green**<br>static   | Home Assistant connected | FULLY STARTED - Normal operating mode    |
 
 
-### Custom States
 
-Additionally there are **LED working states** provided, which can be triggered from your main device configuration.
-They are meant to signals states separate from the main priority logic.
-They temporarily override the LED as long as the script is active, similar to the beacon state.
+### Optional: ⚙️ Working States - pulsing light
 
-| Script ID              | Color + Effect             | Notes (Examples)                                                       |
-| ---------------------- | -------------------------- | ---------------------------------------------------------------------- |
-| `led_working_status_1` | **Blue**<br>slow pulse     | Example: device performing a background task; BT-beacon detected; etc. |
-| `led_working_status_2` | **Purple**<br>slow pulse   | Example: special output is turned on; long-running I²C read; etc.      |
-| `led_working_status_*` | _add more if you like_     |                                                                        |
+Additionally there are LED states provided, which can be triggered from your main device configuration.
+They are meant to signals states separate from the main priority logic and override the system status display until anything else updates the LED state. Currently the following states are supported:
 
-To set and reset the working light you can call the following scripts:
-- `- script.execute: led_working_status_1` (_or any other number_)
-- `- script.execute: led_system_status` (_to reset the LED to the system-status_)
+ `led_working_status_<color>` **blue🔵 | purple🟣 | red🔴 | orange🟠 | yellow🟡 | green🟢 | cyan🔷 | white⚪**
 
-Example:
 ```yaml
 binary_sensor:
   - platform: ble_presence
@@ -105,11 +101,58 @@ binary_sensor:
     timeout: 60s
     on_press:
       then:
-        - script.execute: led_working_status_1
+        - script.execute: 
+          id: led_working_status_blue
+          effect: "Slow Pulse"                # required, can be 'none'
     on_release:
       then:
-        - script.execute: led_system_status
+        - script.execute: led_system_status   # reset to the system status
 ```
+
+> `led_working_status_1` and `led_working_status_2` from a previous version are still supported.
+
+
+### Optional: 📣 Feedback States - blinking
+
+In case you want some direct feedback to any (user) action, the LED can blink several times in these supported colors:
+
+`led_feedback_blink_<color>` **blue🔵 | purple🟣 | red🔴 | orange🟠 | yellow🟡 | green🟢 | cyan🔷 | white⚪**
+
+
+```yaml
+fingerprint_grow:
+  id: fingerprint_reader
+  name: "Fingerprint-Reader"
+  sensing_pin: GPIO15
+  sensor_power_pin:
+      number: GPIO14
+      inverted: true
+  idle_period_to_sleep: 5s
+
+  on_finger_scan_start:
+    then:
+      - script.execute: 
+          id: led_working_status_cyan
+          effect: "Fast Pulse"
+  on_finger_scan_matched:
+    then:
+      - script.execute: 
+          id: led_feedback_blink_green
+          count: 2                        # required, can be 1
+      - button.press: unlock_button
+  on_finger_scan_unmatched:
+    then:
+      - script.execute: 
+          id: led_feedback_blink_red
+          count: 3                        # required, can be 1
+```
+
+The predefined time for LED-On and LED-Pause is set to `200ms`. Can be overridden:
+
+````yaml
+substitutions:
+  blink_on_off_time: "300ms"
+````
 
 
 ## 🚩 Troubleshooting
@@ -137,8 +180,10 @@ binary_sensor:
 
 ## 📌 Open Topics
 
-- [ ] Create additional working-status templates with more effects.
-- [ ] A selectable "stealth mode" (LED off unless error) would be nice.
+
+- [ ] A switch to turn off the LED feedback from the Home Assistant UI (`entity_category: config`)
+- [ ] A slider to adjust the brightness from the Home Assistant UI (`entity_category: config`). This may also address this:
+   - [ ] A selectable "stealth mode" (LED off unless error) would be nice.
 
 ## ❤️ Like My Work?
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I4160K4Y)
