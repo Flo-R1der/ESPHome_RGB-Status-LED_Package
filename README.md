@@ -181,9 +181,9 @@ substitutions:
 ## 📌 Open Topics
 
 
-- [ ] A switch to turn off the LED feedback from the Home Assistant UI (`entity_category: config`)
-- [ ] A slider to adjust the brightness from the Home Assistant UI (`entity_category: config`). This may also address this:
-   - [ ] A selectable "stealth mode" (LED off unless error) would be nice.
+- [ ] A slider to adjust the brightness from the Home Assistant UI (`entity_category: config`). May also address this:
+   - [ ] A switch to turn off the LED feedback from the Home Assistant UI (`entity_category: config`)
+- [ ] A selectable "stealth mode" (LED off unless error) would be nice.
 
 ## ❤️ Like My Work?
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I4160K4Y)
