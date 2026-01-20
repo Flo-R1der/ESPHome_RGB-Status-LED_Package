@@ -16,7 +16,6 @@ The package only requires a single RGB light entity with the ID **`system_status
 ## 🛠️ Set Up
 
 Add the package to your device configuration:
-
 ```yaml
 packages:
   rgb_status_led: 
@@ -29,12 +28,12 @@ Make sure your project defines the required RGB LED light with the **ID `system_
 ```yaml
 light:
   - platform: esp32_rmt_led_strip
-    id: system_status_led             # DO NOT CHANGE
-    name: "Status-LED"
-    pin: GPIO7                        # check your board
-    rgb_order: GRB                    # check your board
+    id: ${system_status_led_id}       # can be changed via substitutions
+    name: "Status-LED"                # Change according to your preferences
+    pin: GPIO7                        # check your board !
+    rgb_order: GRB                    # check your board !
+    chipset: ws2812                   # check your board !
     num_leds: 1
-    chipset: ws2812                   # check your board
     disabled_by_default: true
     default_transition_length: 200ms
     icon: mdi:led-outline
@@ -60,12 +59,17 @@ light:
 > If you prefer another LED type (NeopixelBus, FastLED, CWWW RGB LED), simply keep the ID identical.  
 
 
-### Optional: brightness value
-The predefined brightness is set to `50%`. This can be overridden, by adding a suitable value to your project:
+### Optional Adjustments
+- The ID of the LED is set to `system_status_led`, but can be changed
+- Default brightness is set to `50%`, but can be overridden
+- for the blink effects (see below) the on/of time can be adjusted
 
+You can alter these options, using a `substitutions:` section in your project:
 ````yaml
 substitutions:
-  system_status_led_brightness: "20%"
+  system_status_led_id: "system_status_led"   # Default
+  system_status_led_brightness: "50%"         # Default
+  blink_on_off_time: "200ms"                  # Default
 ````
 
 
@@ -146,13 +150,6 @@ fingerprint_grow:
           id: led_feedback_blink_red
           count: 3                        # required, can be 1
 ```
-
-The predefined time for LED-On and LED-Pause is set to `200ms`. Can be overridden:
-
-````yaml
-substitutions:
-  blink_on_off_time: "300ms"
-````
 
 
 ## 🚩 Troubleshooting
