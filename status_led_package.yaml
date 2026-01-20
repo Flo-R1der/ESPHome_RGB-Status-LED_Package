@@ -11,8 +11,9 @@ globals:
     initial_value: "false"
 
 substitutions:
-  system_status_led_brightness: "50%"   # Default
-  blink_on_off_time: "200ms"           # Default
+  system_status_led_id: "system_status_led"   # Default
+  system_status_led_brightness: "50%"         # Default
+  blink_on_off_time: "200ms"                  # Default
 
 
 
@@ -63,7 +64,7 @@ script:
             lambda: 'return id(api_ok);'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 0%
                 green: 100%
                 blue: 10%
@@ -78,7 +79,7 @@ script:
             lambda: 'return id(wifi_ok);'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 70%
                 green: 70%
                 blue: 70%
@@ -93,7 +94,7 @@ script:
             lambda: 'return id(boot_done);'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 80%
                 green: 80%
                 blue: 0
@@ -104,7 +105,7 @@ script:
 
       # BOOTING (Priority 1) - red (steady)
       - light.turn_on:
-          id: system_status_led
+          id: ${system_status_led_id}
           red: 100%
           green: 0
           blue: 0
@@ -120,7 +121,7 @@ script:
       effect: string 
     then:
       - light.turn_on:
-          id: system_status_led
+          id: ${system_status_led_id}
           red: 0%
           green: 0%
           blue: 100%
@@ -137,7 +138,7 @@ script:
       effect: string
     then:
       - light.turn_on:
-          id: system_status_led
+          id: ${system_status_led_id}
           red: 80%
           green: 0%
           blue: 80%
@@ -154,7 +155,7 @@ script:
       effect: string
     then:
       - light.turn_on:
-          id: system_status_led
+          id: ${system_status_led_id}
           red: 100%
           green: 0%
           blue: 0%
@@ -166,7 +167,7 @@ script:
       effect: string
     then:
       - light.turn_on:
-          id: system_status_led
+          id: ${system_status_led_id}
           red: 100%
           green: 50%
           blue: 0%
@@ -178,7 +179,7 @@ script:
       effect: string
     then:
       - light.turn_on:
-          id: system_status_led
+          id: ${system_status_led_id}
           red: 80%
           green: 80%
           blue: 0%
@@ -190,7 +191,7 @@ script:
       effect: string
     then:
       - light.turn_on:
-          id: system_status_led
+          id: ${system_status_led_id}
           red: 0%
           green: 100%
           blue: 0%
@@ -202,7 +203,7 @@ script:
       effect: string
     then:
       - light.turn_on:
-          id: system_status_led
+          id: ${system_status_led_id}
           red: 0%
           green: 100%
           blue: 100%
@@ -214,7 +215,7 @@ script:
       effect: string
     then:
       - light.turn_on:
-          id: system_status_led
+          id: ${system_status_led_id}
           red: 70%
           green: 70%
           blue: 70%
@@ -232,13 +233,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 0%
                 green: 0%
                 blue: 100%
                 brightness: ${system_status_led_brightness}
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_purple
@@ -249,13 +250,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 80%
                 green: 0%
                 blue: 80%
                 brightness: ${system_status_led_brightness}
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_red
@@ -266,13 +267,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 100%
                 green: 0%
                 blue: 0%
                 brightness: ${system_status_led_brightness}
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_orange
@@ -283,13 +284,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 100%
                 green: 50%
                 blue: 0%
                 brightness: ${system_status_led_brightness}
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_yellow
@@ -300,13 +301,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 80%
                 green: 80%
                 blue: 0%
                 brightness: ${system_status_led_brightness}
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_green
@@ -317,13 +318,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 0%
                 green: 100%
                 blue: 0%
                 brightness: ${system_status_led_brightness}
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_cyan
@@ -334,13 +335,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 0%
                 green: 100%
                 blue: 100%
                 brightness: ${system_status_led_brightness}
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_white
@@ -351,11 +352,11 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 70%
                 green: 70%
                 blue: 70%
                 brightness: ${system_status_led_brightness}
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
