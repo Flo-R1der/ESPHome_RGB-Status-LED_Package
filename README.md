@@ -59,10 +59,28 @@ light:
 > If you prefer another LED type (NeopixelBus, FastLED, CWWW RGB LED), simply keep the ID identical.  
 
 
-### Optional Adjustments
-- The ID of the LED is set to `system_status_led`, but can be changed
-- Default brightness is set to `50%`, but can be overridden
-- for the blink effects (see below) the on/of time can be adjusted
+### Optional Settings
+
+<details><summary><strong>Change the `system_status_led_id`</strong></summary>
+
+The ID of the LED is set to `system_status_led` per default, but can be changed using substitutions:
+
+````yaml
+substitutions:
+  system_status_led_id: "my_custom_led_id"
+````
+</details>
+
+<details><summary><strong>Brightness System Status LED</strong></summary>
+
+The brightness of the LED is set to `50%` by default. Can be changed using the number input in the **Home Assistant Dashboard** (Entity Category: Config). This enables you to dynamicly:
+- **Turn off** the LED by setting the brightness to `0%`
+- **Turn on** the LED using a suitable value
+- Switch between **Day-/Night-Mode** using suitable values 
+
+using automations or with manual settings.
+</details>
+
 
 You can alter these options, using a `substitutions:` section in your project:
 ````yaml
