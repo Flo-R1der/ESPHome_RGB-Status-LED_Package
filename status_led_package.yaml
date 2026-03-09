@@ -160,12 +160,11 @@ script:
     parameters:
       effect: string 
     then:
-      - light.turn_on:
-          id: ${system_status_led_id}
-          red: 0%
-          green: 0%
-          blue: 100%
-          brightness: !lambda 'return id(system_status_led_brightness);'
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0
+          green: 0
+          blue: 1
           effect: !lambda 'return effect;'
   - id: led_working_status_1  # LEGACY ALIAS → led_working_status_blue
     then:
@@ -177,12 +176,11 @@ script:
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: ${system_status_led_id}
-          red: 80%
-          green: 0%
-          blue: 80%
-          brightness: !lambda 'return id(system_status_led_brightness);'
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0.8
+          green: 0
+          blue: 0.8
           effect: !lambda 'return effect;'
   - id: led_working_status_2  # LEGACY ALIAS → led_working_status_purple
     then:
@@ -194,72 +192,66 @@ script:
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: ${system_status_led_id}
-          red: 100%
-          green: 0%
-          blue: 0%
-          brightness: !lambda 'return id(system_status_led_brightness);'
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 1
+          green: 0
+          blue: 0
           effect: !lambda 'return effect;'
 
   - id: led_working_status_orange
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: ${system_status_led_id}
-          red: 100%
-          green: 50%
-          blue: 0%
-          brightness: !lambda 'return id(system_status_led_brightness);'
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 1
+          green: 0.5
+          blue: 0
           effect: !lambda 'return effect;'
 
   - id: led_working_status_yellow
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: ${system_status_led_id}
-          red: 80%
-          green: 80%
-          blue: 0%
-          brightness: !lambda 'return id(system_status_led_brightness);'
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0.8
+          green: 0.8
+          blue: 0
           effect: !lambda 'return effect;'
 
   - id: led_working_status_green
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: ${system_status_led_id}
-          red: 0%
-          green: 100%
-          blue: 0%
-          brightness: !lambda 'return id(system_status_led_brightness);'
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0
+          green: 1
+          blue: 0
           effect: !lambda 'return effect;'
 
   - id: led_working_status_cyan
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: ${system_status_led_id}
-          red: 0%
-          green: 100%
-          blue: 100%
-          brightness: !lambda 'return id(system_status_led_brightness);'
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0
+          green: 1
+          blue: 1
           effect: !lambda 'return effect;'
 
   - id: led_working_status_white
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: ${system_status_led_id}
-          red: 70%
-          green: 70%
-          blue: 70%
-          brightness: !lambda 'return id(system_status_led_brightness);'
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0.7
+          green: 0.7
+          blue: 0.7
           effect: !lambda 'return effect;'
 
 
