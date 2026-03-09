@@ -39,19 +39,16 @@ light:
     icon: mdi:led-outline
     restore_mode: ALWAYS_OFF
     entity_category: "diagnostic"
-    effects:                          # only for working- or feedback-states required
-      - pulse:
-          name: "Fast Pulse"                               # can be adjusted
-          update_interval: 400ms                           # can be adjusted
-          max_brightness: ${system_status_led_brightness}  # provided by the package
-      - pulse:
-          name: "Slow Pulse"                               # can be adjusted
-          update_interval: 1s                              # can be adjusted
-          max_brightness: ${system_status_led_brightness}  # provided by the package
-      - pulse:
-          name: "Breath"                                   # can be adjusted
-          update_interval: 2.5s                            # can be adjusted
-          max_brightness: ${system_status_led_brightness}  # provided by the package
+    effects:                          # only required when using working- or feedback-states
+      - lambda:
+          name: "Pulse"
+          update_interval: 100ms
+          lambda: |-
+            esphome::system_status_led_fx::pulse(
+              id(system_status_led),
+              id(system_status_led_effect_length),
+              id(system_status_led_brightness)
+            );
 ```
 
 > [!NOTE]  

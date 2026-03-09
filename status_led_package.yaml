@@ -13,10 +13,18 @@ globals:
     type: float
     restore_value: yes
     initial_value: "-1"
+  - id: system_status_led_effect_length
+    type: int
+    initial_value: "1000"  # default length for effects in ms
 
 substitutions:
+  # Default values for the package. Can be overridden in the main configuration file.
   system_status_led_id: "system_status_led"   # Default
   system_status_led_brightness: "50%"         # used for first start + may be used for legacy effects
+  length_fast_pulse: "400"                    # no unit allowed, value in ms
+  length_slow_pulse: "1000"                   # no unit allowed, value in ms
+  length_breath: "2500"                       # no unit allowed, value in ms
+  blink_on_off_time: "200ms"                  # unit required
 
 
 # Input Number to set the brightness of the LED from Home Assistant.
@@ -40,6 +48,9 @@ number:
 ##### CATCH SYSTEM EVENTS #####
 # boot priority values: https://esphome.io/components/esphome/#configuration-variables-1
 esphome:
+  includes:
+    - includes/system_status_led_effect.h
+
   on_boot:
     - priority: 700
       then:
@@ -389,3 +400,40 @@ script:
             - delay: ${blink_on_off_time}
             - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
+
+
+##### LED EFFECT HANDLER #####
+# This script is called by the working status scripts to set the desired effect
+# with the correct lengt and brightness.
+  - id: system_status_led_effect_handler
+    parameters:
+      effect: string
+      red: float
+      green: float
+      blue: float
+    then:
+      - globals.set:
+          id: system_status_led_effect_length
+          value: !lambda |-
+            if (effect == "none") {
+              return 0;
+            } else if (effect == "Fast Pulse") {
+              return ${length_fast_pulse};
+            } else if (effect == "Slow Pulse") {
+              return ${length_slow_pulse};
+            } else if (effect == "Breath") {
+              return ${length_breath};
+            } else {
+              return 1000;
+            }
+      - logger.log:
+          format: "Setting LED effect to \"%s\" with length: %dms (%.0f%% brightness)"
+          args: ['effect.c_str()', 'id(system_status_led_effect_length)', 'id(system_status_led_brightness)']
+          level: INFO
+      - light.turn_on:
+          id: system_status_led
+          red: !lambda 'return red;'
+          green: !lambda 'return green;'
+          blue: !lambda 'return blue;'
+          effect: "Pulse"
+          brightness: !lambda 'return id(system_status_led_brightness);'
