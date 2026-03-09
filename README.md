@@ -23,7 +23,7 @@ packages:
     file: status_led_package.yaml
 ```
 
-Make sure your project defines the required RGB LED light with the **ID `system_status_led`**. The following `light` configuration has proven to work on a [LOLIN C3 Mini](https://www.espboards.dev/esp32/lolin-c3-mini/) (`board: lolin_c3_mini`):
+Make sure your project defines the required RGB LED light with the **ID `system_status_led`**. The following `light` configuration has proven to work on multiple devices:
 
 ```yaml
 light:
@@ -53,7 +53,7 @@ light:
 
 > [!NOTE]  
 > The package does **not** depend on any specific LED chipset or ESP32 variant.  
-> If you prefer another LED type (NeopixelBus, FastLED, CWWW RGB LED), simply keep the ID identical.  
+> If you prefer another LED type (NeopixelBus, FastLED, CWWW RGB LED), **simply keep the ID identical**.  
 
 
 ### Optional Settings
@@ -78,15 +78,20 @@ The brightness of the LED is set to `50%` by default. Can be changed using the n
 using automations or with manual settings.
 </details>
 
+<details><summary><strong>Effect Configuration</strong></summary>
+
+The following substitutions are configured by default. Can be overridden, in your project yaml.
 
 You can alter these options, using a `substitutions:` section in your project:
 ````yaml
 substitutions:
-  system_status_led_id: "system_status_led"   # Default
-  system_status_led_brightness: "50%"         # Default
-  blink_on_off_time: "200ms"                  # Default
+  length_fast_pulse: "400"                    # no unit allowed, value in ms
+  length_slow_pulse: "1000"                   # no unit allowed, value in ms
+  length_breath: "2500"                       # no unit allowed, value in ms
+  blink_on_off_time: "200ms"                  # must contain a unit
 ````
-
+Details about the effect capabilities and usage below.
+</details>
 
 ## 💡 LED Colors and States
 
@@ -130,6 +135,15 @@ binary_sensor:
 
 > `led_working_status_1` and `led_working_status_2` from a previous version are still supported.
 
+| **Effect**   | **Description**          | **possible substitution** |
+| ----------   | ------------------------ | ------------------------- |
+| `none`       | **steady** light         |                           |
+| `Slow Pulse` | **1000ms** pulsing light | `length_slow_pulse`       |
+| `Fast Pulse` | **400ms** pulsing light  | `length_fast_pulse`       |
+| `Breath`     | **2500ms** pulsing light | `length_breath`           |
+
+See also **[Optional Settings](#optional-settings) > Effect Configuration** for substituting values.
+
 
 ### Optional: 📣 Feedback States - blinking
 
@@ -165,6 +179,8 @@ fingerprint_grow:
           id: led_feedback_blink_red
           count: 3                        # required, can be 1
 ```
+
+See also **[Optional Settings](#optional-settings) > Effect Configuration** for timing and substitution.
 
 
 ## 🚩 Troubleshooting
