@@ -70,7 +70,7 @@ substitutions:
 
 <details><summary><strong>Brightness System Status LED</strong></summary>
 
-The brightness of the LED is set to `50%` by default. Can be changed using the number input in the **Home Assistant Dashboard** (Entity Category: Config). This enables you to dynamicly:
+The brightness of the LED is set to `50%` by default. Can be changed using the number input in the **Home Assistant Dashboard** (Entity Category: Config). This enables you to dynamically:
 - **Turn off** the LED by setting the brightness to `0%`
 - **Turn on** the LED using a suitable value
 - Switch between **Day-/Night-Mode** using suitable values 
@@ -229,10 +229,9 @@ See also **[Optional Settings](#optional-settings) > Effect Configuration** for 
 
 ## 📌 Open Topics
 
+- [ ]  A selectable "stealth mode" (LED off unless error) would be nice.
+   - What exactly is considered as an error? 🤔
 
-- [ ] A slider to adjust the brightness from the Home Assistant UI (`entity_category: config`). May also address this:
-   - [ ] A switch to turn off the LED feedback from the Home Assistant UI (`entity_category: config`)
-- [ ] A selectable "stealth mode" (LED off unless error) would be nice.
 
 ## ❤️ Like My Work?
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I4160K4Y)
