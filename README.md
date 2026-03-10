@@ -93,6 +93,27 @@ substitutions:
 Details about the effect capabilities and usage below.
 </details>
 
+<details><summary><strong>ESPHome Log-Configuration</strong></summary>
+
+In case you are checking the logs and the light entity is "spamming", you might consider degrading the log-level for the light domain:
+````yaml
+logger:
+  logs:
+    light: INFO
+````
+
+Whereas the `VERBOSE` log level provides detailed information about the effect values:
+````yaml
+logger:
+  level: VERBOSE
+  initial_level: DEBUG
+  logs:
+    light: VERBOSE
+    system_status_led: VERBOSE
+````
+</details>
+
+
 ## 💡 LED Colors and States
 
 ### 🚦 System States - static light
