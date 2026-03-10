@@ -429,3 +429,23 @@ script:
           blue: !lambda 'return blue;'
           effect: "Pulse"
           brightness: !lambda 'return id(system_status_led_brightness);'
+      - delay: 100ms
+      # - lambda: |-
+      #     std::string effectName = id(system_status_led).get_effect_name();
+      #     ESP_LOGI("system_status_led", "Current detected effect name: %s", effectName.c_str());
+      - if:
+          condition:
+            lambda: |-
+              return id(system_status_led).get_effect_name() != "Pulse";
+          then:
+            - lambda: |-
+                ESP_LOGW("system_status_led", "New flexible effect seems to be missing? Trying to use the legacy effects.");
+                ESP_LOGW("system_status_led", "Please update your Status-LED settings in your project!");
+                ESP_LOGW("system_status_led", "Details here: https://github.com/Flo-R1der/ESPHome_RGB-Status-LED_Package");
+            - light.turn_on:
+                id: system_status_led
+                red: !lambda 'return red;'
+                green: !lambda 'return green;'
+                blue: !lambda 'return blue;'
+                effect: !lambda 'return effect;'
+                brightness: !lambda 'return id(system_status_led_brightness);'
