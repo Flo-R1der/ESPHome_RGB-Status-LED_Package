@@ -33,6 +33,8 @@ external_components:
       ref: test_external-component
     components: [system_status_led_fx]
     refresh: 1d
+system_status_led_fx:   # is required to activate the external component
+  # this custom component provides dynamic brightness and flexible effect length
 
 # Input Number to set the brightness of the LED from Home Assistant.
 number:
