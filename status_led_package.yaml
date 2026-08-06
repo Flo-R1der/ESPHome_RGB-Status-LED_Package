@@ -26,6 +26,15 @@ substitutions:
   length_breath: "2500"                       # no unit allowed, value in ms
   blink_on_off_time: "200ms"                  # unit required
 
+external_components:
+  - source: 
+      type: git
+      url: https://github.com/Flo-R1der/ESPHome_RGB-Status-LED_Package
+      ref: test_external-component
+    components: [system_status_led_fx]
+    refresh: 1d
+system_status_led_fx:   # is required to activate the external component
+  # this custom component provides dynamic brightness and flexible effect length
 
 # Input Number to set the brightness of the LED from Home Assistant.
 number:
@@ -48,9 +57,6 @@ number:
 ##### CATCH SYSTEM EVENTS #####
 # boot priority values: https://esphome.io/components/esphome/#configuration-variables-1
 esphome:
-  includes:
-    - includes/system_status_led_effect.h
-
   on_boot:
     - priority: 700
       then:
