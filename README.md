@@ -16,7 +16,6 @@ The package only requires a single RGB light entity with the ID **`system_status
 ## 🛠️ Set Up
 
 Add the package to your device configuration:
-
 ```yaml
 packages:
   rgb_status_led: 
@@ -24,49 +23,98 @@ packages:
     file: status_led_package.yaml
 ```
 
-Make sure your project defines the required RGB LED light with the **ID `system_status_led`**. The following `light` configuration has proven to work on a [LOLIN C3 Mini](https://www.espboards.dev/esp32/lolin-c3-mini/) (`board: lolin_c3_mini`):
+Make sure your project defines the required RGB LED light with the **ID `system_status_led`**. The following `light` configuration has proven to work on multiple devices:
 
 ```yaml
 light:
   - platform: esp32_rmt_led_strip
-    id: system_status_led             # DO NOT CHANGE
-    name: "Status-LED"
-    pin: GPIO7                        # check your board
-    rgb_order: GRB                    # check your board
+    id: ${system_status_led_id}       # can be changed via substitutions
+    name: "Status-LED"                # Change according to your preferences
+    pin: GPIO7                        # check your board !
+    rgb_order: GRB                    # check your board !
+    chipset: ws2812                   # check your board !
     num_leds: 1
-    chipset: ws2812                   # check your board
     disabled_by_default: true
     default_transition_length: 200ms
     icon: mdi:led-outline
     restore_mode: ALWAYS_OFF
     entity_category: "diagnostic"
-    effects:                          # only for working- or feedback-states required
-      - pulse:
-          name: "Fast Pulse"                               # can be adjusted
-          update_interval: 400ms                           # can be adjusted
-          max_brightness: ${system_status_led_brightness}  # provided by the package
-      - pulse:
-          name: "Slow Pulse"                               # can be adjusted
-          update_interval: 1s                              # can be adjusted
-          max_brightness: ${system_status_led_brightness}  # provided by the package
-      - pulse:
-          name: "Breath"                                   # can be adjusted
-          update_interval: 2.5s                            # can be adjusted
-          max_brightness: ${system_status_led_brightness}  # provided by the package
+    effects:                          # only required when using working- or feedback-states
+      - lambda:
+          name: "Pulse"
+          update_interval: 100ms
+          lambda: |-
+            esphome::system_status_led_fx::pulse(
+              id(system_status_led),
+              id(system_status_led_effect_length),
+              id(system_status_led_brightness)
+            );
 ```
 
 > [!NOTE]  
 > The package does **not** depend on any specific LED chipset or ESP32 variant.  
-> If you prefer another LED type (NeopixelBus, FastLED, CWWW RGB LED), simply keep the ID identical.  
+> If you prefer another LED type (NeopixelBus, FastLED, CWWW RGB LED), **simply keep the ID identical**.  
+
+> [!TIP]  
+> In previous versions of this package there where 3 effects (Fast Pulse, Slow Pulse, Breath) that have been replaced with a more convenient and flexible version, shown above. They continue to work, but are marked as legacy. Please consider to update the `effects:`-section in your project.
 
 
-### Optional: brightness value
-The predefined brightness is set to `50%`. This can be overridden, by adding a suitable value to your project:
+### Optional Settings
+
+<details><summary><strong>Change the `system_status_led_id`</strong></summary>
+
+The ID of the LED is set to `system_status_led` per default, but can be changed using substitutions:
 
 ````yaml
 substitutions:
-  system_status_led_brightness: "20%"
+  system_status_led_id: "my_custom_led_id"
 ````
+</details>
+
+<details><summary><strong>Brightness System Status LED</strong></summary>
+
+The brightness of the LED is set to `50%` by default. Can be changed using the number input in the **Home Assistant Dashboard** (Entity Category: Config). This enables you to dynamically:
+- **Turn off** the LED by setting the brightness to `0%`
+- **Turn on** the LED using a suitable value
+- Switch between **Day-/Night-Mode** using suitable values 
+
+using automations or with manual settings.
+</details>
+
+<details><summary><strong>Effect Configuration</strong></summary>
+
+The following substitutions are configured by default. Can be overridden, in your project yaml.
+
+You can alter these options, using a `substitutions:` section in your project:
+````yaml
+substitutions:
+  length_fast_pulse: "400"                    # no unit allowed, value in ms
+  length_slow_pulse: "1000"                   # no unit allowed, value in ms
+  length_breath: "2500"                       # no unit allowed, value in ms
+  blink_on_off_time: "200ms"                  # must contain a unit
+````
+Details about the effect capabilities and usage below.
+</details>
+
+<details><summary><strong>ESPHome Log-Configuration</strong></summary>
+
+In case you are checking the logs and the light entity is "spamming", you might consider degrading the log-level for the light domain:
+````yaml
+logger:
+  logs:
+    light: INFO
+````
+
+Whereas the `VERBOSE` log level provides detailed information about the effect values:
+````yaml
+logger:
+  level: VERBOSE
+  initial_level: DEBUG
+  logs:
+    light: VERBOSE
+    system_status_led: VERBOSE
+````
+</details>
 
 
 ## 💡 LED Colors and States
@@ -111,6 +159,15 @@ binary_sensor:
 
 > `led_working_status_1` and `led_working_status_2` from a previous version are still supported.
 
+| **Effect**   | **Description**          | **possible substitution** |
+| ----------   | ------------------------ | ------------------------- |
+| `none`       | **steady** light         |                           |
+| `Slow Pulse` | **1000ms** pulsing light | `length_slow_pulse`       |
+| `Fast Pulse` | **400ms** pulsing light  | `length_fast_pulse`       |
+| `Breath`     | **2500ms** pulsing light | `length_breath`           |
+
+See also **[Optional Settings](#optional-settings) > Effect Configuration** for substituting values.
+
 
 ### Optional: 📣 Feedback States - blinking
 
@@ -147,12 +204,7 @@ fingerprint_grow:
           count: 3                        # required, can be 1
 ```
 
-The predefined time for LED-On and LED-Pause is set to `200ms`. Can be overridden:
-
-````yaml
-substitutions:
-  blink_on_off_time: "300ms"
-````
+See also **[Optional Settings](#optional-settings) > Effect Configuration** for timing and substitution.
 
 
 ## 🚩 Troubleshooting
@@ -180,10 +232,9 @@ substitutions:
 
 ## 📌 Open Topics
 
+- [ ]  A selectable "stealth mode" (LED off unless error) would be nice.
+   - What exactly is considered as an error? 🤔
 
-- [ ] A switch to turn off the LED feedback from the Home Assistant UI (`entity_category: config`)
-- [ ] A slider to adjust the brightness from the Home Assistant UI (`entity_category: config`). This may also address this:
-   - [ ] A selectable "stealth mode" (LED off unless error) would be nice.
 
 ## ❤️ Like My Work?
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I4160K4Y)

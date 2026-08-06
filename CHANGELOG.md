@@ -1,3 +1,12 @@
+# 2026-08-06
+- replaced multiple effects with one lambda `system_status_led_fx` (#8)
+- use `system_status_led_effect_handler` script to map old an new effects
+- implemented "Brightness System Status LED"-Slider for dynamic brightness adjustment (#7)
+- LED-ID can now be adjusted with `system_status_led_id` substitution (#4)
+- updated Documentation
+
+<br>
+
 # 2026-01-17
 - **System Status** is now 'static' / no effect for min. dependency and max. stability
 - **Working States** are not pulsing: "Fast Pulse", "Slow Pulse", "Breathe"

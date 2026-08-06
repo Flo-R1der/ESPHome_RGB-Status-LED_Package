@@ -9,11 +9,48 @@ globals:
   - id: api_ok
     type: bool
     initial_value: "false"
+  - id: system_status_led_brightness
+    type: float
+    restore_value: yes
+    initial_value: "-1"
+  - id: system_status_led_effect_length
+    type: int
+    initial_value: "1000"  # default length for effects in ms
 
 substitutions:
-  system_status_led_brightness: "50%"   # Default
-  blink_on_off_time: "200ms"           # Default
+  # Default values for the package. Can be overridden in the main configuration file.
+  system_status_led_id: "system_status_led"   # Default
+  system_status_led_brightness: "50%"         # used for first start + may be used for legacy effects
+  length_fast_pulse: "400"                    # no unit allowed, value in ms
+  length_slow_pulse: "1000"                   # no unit allowed, value in ms
+  length_breath: "2500"                       # no unit allowed, value in ms
+  blink_on_off_time: "200ms"                  # unit required
 
+external_components:
+  - source: 
+      type: git
+      url: https://github.com/Flo-R1der/ESPHome_RGB-Status-LED_Package
+    components: [system_status_led_fx]
+    refresh: 1d
+system_status_led_fx:   # is required to activate the external component
+  # this custom component provides dynamic brightness and flexible effect length
+
+# Input Number to set the brightness of the LED from Home Assistant.
+number:
+  - platform: template
+    id: system_status_led_brightness_number
+    name: "Brightness System Status LED"
+    icon: "mdi:label-percent-outline"
+    min_value: 0
+    max_value: 100
+    step: 1
+    unit_of_measurement: "%"
+    entity_category: "config"
+    mode: "slider"
+    optimistic: true
+    set_action:
+      - lambda: 'id(system_status_led_brightness) = (x / 100.0);'
+      - script.execute: led_system_status
 
 
 ##### CATCH SYSTEM EVENTS #####
@@ -28,6 +65,15 @@ esphome:
         - delay: 500ms
           # depending on your board, the red LED may light up so shortly that you don't see it
           # this delay ensures the red light comes up and you can recognize boot-loop issues
+        - if:
+            condition: 
+              - lambda: "return id(system_status_led_brightness) == -1;"
+            then:
+              - lambda: |-
+                  id(system_status_led_brightness) = ( ${system_status_led_brightness[:-1]} / 100 );
+        - number.set:
+            id: system_status_led_brightness_number
+            value: !lambda "return id(system_status_led_brightness) * 100;"
         - lambda: 'id(boot_done) = true;'
         - script.execute: led_system_status
 
@@ -63,11 +109,11 @@ script:
             lambda: 'return id(api_ok);'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 0%
                 green: 100%
                 blue: 10%
-                brightness: ${system_status_led_brightness}
+                brightness: !lambda 'return id(system_status_led_brightness);'
                 effect: none
             - script.stop:
                 id: led_system_status
@@ -78,11 +124,11 @@ script:
             lambda: 'return id(wifi_ok);'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 70%
                 green: 70%
                 blue: 70%
-                brightness: ${system_status_led_brightness}
+                brightness: !lambda 'return id(system_status_led_brightness);'
                 effect: none
             - script.stop:
                 id: led_system_status
@@ -93,22 +139,22 @@ script:
             lambda: 'return id(boot_done);'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 80%
                 green: 80%
                 blue: 0
-                brightness: 50%
+                brightness: !lambda 'return id(system_status_led_brightness);'
                 effect: none
             - script.stop:
                 id: led_system_status
 
       # BOOTING (Priority 1) - red (steady)
       - light.turn_on:
-          id: system_status_led
+          id: ${system_status_led_id}
           red: 100%
           green: 0
           blue: 0
-          brightness: 50%
+          brightness: !lambda 'return id(system_status_led_brightness);'
           effect: none
 
 
@@ -119,12 +165,11 @@ script:
     parameters:
       effect: string 
     then:
-      - light.turn_on:
-          id: system_status_led
-          red: 0%
-          green: 0%
-          blue: 100%
-          brightness: ${system_status_led_brightness}
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0
+          green: 0
+          blue: 1
           effect: !lambda 'return effect;'
   - id: led_working_status_1  # LEGACY ALIAS → led_working_status_blue
     then:
@@ -136,12 +181,11 @@ script:
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: system_status_led
-          red: 80%
-          green: 0%
-          blue: 80%
-          brightness: ${system_status_led_brightness}
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0.8
+          green: 0
+          blue: 0.8
           effect: !lambda 'return effect;'
   - id: led_working_status_2  # LEGACY ALIAS → led_working_status_purple
     then:
@@ -153,72 +197,66 @@ script:
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: system_status_led
-          red: 100%
-          green: 0%
-          blue: 0%
-          brightness: ${system_status_led_brightness}
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 1
+          green: 0
+          blue: 0
           effect: !lambda 'return effect;'
 
   - id: led_working_status_orange
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: system_status_led
-          red: 100%
-          green: 50%
-          blue: 0%
-          brightness: ${system_status_led_brightness}
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 1
+          green: 0.5
+          blue: 0
           effect: !lambda 'return effect;'
 
   - id: led_working_status_yellow
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: system_status_led
-          red: 80%
-          green: 80%
-          blue: 0%
-          brightness: ${system_status_led_brightness}
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0.8
+          green: 0.8
+          blue: 0
           effect: !lambda 'return effect;'
 
   - id: led_working_status_green
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: system_status_led
-          red: 0%
-          green: 100%
-          blue: 0%
-          brightness: ${system_status_led_brightness}
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0
+          green: 1
+          blue: 0
           effect: !lambda 'return effect;'
 
   - id: led_working_status_cyan
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: system_status_led
-          red: 0%
-          green: 100%
-          blue: 100%
-          brightness: ${system_status_led_brightness}
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0
+          green: 1
+          blue: 1
           effect: !lambda 'return effect;'
 
   - id: led_working_status_white
     parameters:
       effect: string
     then:
-      - light.turn_on:
-          id: system_status_led
-          red: 70%
-          green: 70%
-          blue: 70%
-          brightness: ${system_status_led_brightness}
+      - script.execute:
+          id: system_status_led_effect_handler
+          red: 0.7
+          green: 0.7
+          blue: 0.7
           effect: !lambda 'return effect;'
 
 
@@ -232,13 +270,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 0%
                 green: 0%
                 blue: 100%
-                brightness: ${system_status_led_brightness}
+                brightness: !lambda 'return id(system_status_led_brightness);'
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_purple
@@ -249,13 +287,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 80%
                 green: 0%
                 blue: 80%
-                brightness: ${system_status_led_brightness}
+                brightness: !lambda 'return id(system_status_led_brightness);'
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_red
@@ -266,13 +304,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 100%
                 green: 0%
                 blue: 0%
-                brightness: ${system_status_led_brightness}
+                brightness: !lambda 'return id(system_status_led_brightness);'
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_orange
@@ -283,13 +321,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 100%
                 green: 50%
                 blue: 0%
-                brightness: ${system_status_led_brightness}
+                brightness: !lambda 'return id(system_status_led_brightness);'
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_yellow
@@ -300,13 +338,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 80%
                 green: 80%
                 blue: 0%
-                brightness: ${system_status_led_brightness}
+                brightness: !lambda 'return id(system_status_led_brightness);'
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_green
@@ -317,13 +355,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 0%
                 green: 100%
                 blue: 0%
-                brightness: ${system_status_led_brightness}
+                brightness: !lambda 'return id(system_status_led_brightness);'
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_cyan
@@ -334,13 +372,13 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 0%
                 green: 100%
                 blue: 100%
-                brightness: ${system_status_led_brightness}
+                brightness: !lambda 'return id(system_status_led_brightness);'
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
 
   - id: led_feedback_blink_white
@@ -351,11 +389,68 @@ script:
           count: !lambda 'return count;'
           then:
             - light.turn_on:
-                id: system_status_led
+                id: ${system_status_led_id}
                 red: 70%
                 green: 70%
                 blue: 70%
-                brightness: ${system_status_led_brightness}
+                brightness: !lambda 'return id(system_status_led_brightness);'
             - delay: ${blink_on_off_time}
-            - light.turn_off: system_status_led
+            - light.turn_off: ${system_status_led_id}
             - delay: ${blink_on_off_time}
+
+
+##### LED EFFECT HANDLER #####
+# This script is called by the working status scripts to set the desired effect
+# with the correct lengt and brightness.
+  - id: system_status_led_effect_handler
+    parameters:
+      effect: string
+      red: float
+      green: float
+      blue: float
+    then:
+      - globals.set:
+          id: system_status_led_effect_length
+          value: !lambda |-
+            if (effect == "none") {
+              return 0;
+            } else if (effect == "Fast Pulse") {
+              return ${length_fast_pulse};
+            } else if (effect == "Slow Pulse") {
+              return ${length_slow_pulse};
+            } else if (effect == "Breath") {
+              return ${length_breath};
+            } else {
+              return 1000;
+            }
+      - logger.log:
+          format: "Setting LED effect to \"%s\" with length: %dms (%.0f%% brightness)"
+          args: ['effect.c_str()', 'id(system_status_led_effect_length)', 'id(system_status_led_brightness)']
+          level: INFO
+      - light.turn_on:
+          id: system_status_led
+          red: !lambda 'return red;'
+          green: !lambda 'return green;'
+          blue: !lambda 'return blue;'
+          effect: "Pulse"
+          brightness: !lambda 'return id(system_status_led_brightness);'
+      - delay: 100ms
+      # - lambda: |-
+      #     std::string effectName = id(system_status_led).get_effect_name();
+      #     ESP_LOGI("system_status_led", "Current detected effect name: %s", effectName.c_str());
+      - if:
+          condition:
+            lambda: |-
+              return id(system_status_led).get_effect_name() != "Pulse";
+          then:
+            - lambda: |-
+                ESP_LOGW("system_status_led", "New flexible effect seems to be missing? Trying to use the legacy effects.");
+                ESP_LOGW("system_status_led", "Please update your Status-LED settings in your project!");
+                ESP_LOGW("system_status_led", "Details here: https://github.com/Flo-R1der/ESPHome_RGB-Status-LED_Package");
+            - light.turn_on:
+                id: system_status_led
+                red: !lambda 'return red;'
+                green: !lambda 'return green;'
+                blue: !lambda 'return blue;'
+                effect: !lambda 'return effect;'
+                brightness: !lambda 'return id(system_status_led_brightness);'
