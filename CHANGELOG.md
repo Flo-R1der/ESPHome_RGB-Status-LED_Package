@@ -1,4 +1,4 @@
-# 2026-03-10
+# 2026-08-06
 - replaced multiple effects with one lambda `system_status_led_fx` (#8)
 - use `system_status_led_effect_handler` script to map old an new effects
 - implemented "Brightness System Status LED"-Slider for dynamic brightness adjustment (#7)

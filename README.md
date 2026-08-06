@@ -55,6 +55,9 @@ light:
 > The package does **not** depend on any specific LED chipset or ESP32 variant.  
 > If you prefer another LED type (NeopixelBus, FastLED, CWWW RGB LED), **simply keep the ID identical**.  
 
+> [!TIP]  
+> In previous versions of this package there where 3 effects (Fast Pulse, Slow Pulse, Breath) that have been replaced with a more convenient and flexible version, shown above. They continue to work, but are marked as legacy. Please consider to update the `effects:`-section in your project.
+
 
 ### Optional Settings
 
